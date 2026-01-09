@@ -6,6 +6,6 @@ class QueryRequest(BaseModel):
     query:str
 
 @app.get("/query"):
-#main
+
 async def query_travel_agent(query:QueryRequest):
     
