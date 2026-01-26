@@ -2,43 +2,42 @@ from langchain_community.utilities.alpha_vantage import AlphaVantageAPIWrapper
 from langchain.tools import tool
 import os
 from dotenv import load_dotenv
+
 load_dotenv()
 
 
 @tool
 def multiply(a: int, b: int) -> int:
-    """
-    Multiply two integers.
-
-    Args:
-        a (int): The first integer.
-        b (int): The second integer.
-
-    Returns:
-        int: The product of a and b.
-    """
+    """Multiply two integers."""
     return a * b
 
 
 @tool
 def add(a: int, b: int) -> int:
-    """
-    Add two integers.
-
-    Args:
-        a (int): The first integer.
-        b (int): The second integer.
-
-    Returns:
-        int: The sum of a and b.
-    """
+    """Add two integers."""
     return a + b
 
 
 @tool
 def currency_converter(from_curr: str, to_curr: str, value: float) -> float:
-    os.environ["ALPHAVANTAGE_API_KEY"] = os.getenv('ALPHAVANTAGE_API_KEY')
+    """Convert currency using real-time Alpha Vantage rates."""
+    api_key = os.getenv("ALPHAVANTAGE_API_KEY")
+    if not api_key:
+        raise EnvironmentError("ALPHAVANTAGE_API_KEY is not set")
+
+    os.environ["ALPHAVANTAGE_API_KEY"] = api_key
     alpha_vantage = AlphaVantageAPIWrapper()
-    response = alpha_vantage._get_exchange_rate(from_curr, to_curr)
-    exchange_rate = response['Realtime Currency Exchange Rate']['5. Exchange Rate']
-    return value * float(exchange_rate)
+
+    try:
+        response = alpha_vantage.get_exchange_rate(from_curr, to_curr)
+
+        rate = float(
+            response["Realtime Currency Exchange Rate"]["5. Exchange Rate"]
+        )
+
+        return value * rate
+
+    except Exception as e:
+        raise RuntimeError(
+            f"Currency conversion failed ({from_curr} → {to_curr}, value={value}): {e}"
+        ) from e

@@ -1,22 +1,26 @@
 class Calculator:
     @staticmethod
-    def multiply(a: int, b: int) -> int:
+    def multiply(a: float, b: float) -> float:
         """
-        Multiply two integers.
+        Multiply two numbers.
 
         Args:
-            a (int): The first integer.
-            b (int): The second integer.
+            a (float): The first number.
+            b (float): The second number.
 
         Returns:
-            int: The product of a and b.
+            float: The product of a and b
         """
-        return a * b
+        try:
+            return float(a) * float(b)
+        except (TypeError, ValueError) as e:
+            raise ValueError(
+                f"Invalid inputs for multiply: a={a}, b={b}") from e
 
     @staticmethod
     def calculate_total(*x: float) -> float:
         """
-        Calculate sum of the given list of numbers
+        Calculate sum of the given list of numbers.
 
         Args:
             x (list): List of floating numbers
@@ -24,12 +28,17 @@ class Calculator:
         Returns:
             float: The sum of numbers in the list x
         """
-        return sum(x)
+        try:
+            values = [float(v) for v in x]
+            return sum(values)
+        except (TypeError, ValueError) as e:
+            raise ValueError(
+                f"Invalid inputs for calculate_total: x={x}") from e
 
     @staticmethod
     def calculate_daily_budget(total: float, days: int) -> float:
         """
-        Calculate daily budget
+        Calculate daily budget.
 
         Args:
             total (float): Total cost.
@@ -38,4 +47,16 @@ class Calculator:
         Returns:
             float: Expense for a single day
         """
-        return total / days if days > 0 else 0
+        try:
+            total = float(total)
+            days = int(days)
+
+            if days <= 0:
+                raise ValueError("Days must be greater than zero")
+
+            return total / days
+
+        except (TypeError, ValueError) as e:
+            raise ValueError(
+                f"Invalid inputs for calculate_daily_budget: total={total}, days={days}"
+            ) from e
